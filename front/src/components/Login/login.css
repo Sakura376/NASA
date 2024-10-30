@@ -1,0 +1,61 @@
+/* Contenedor del formulario de login */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 400px;
+    margin: 100px auto; /* Centra el formulario en la página */
+    padding: 20px;
+    background-color: #f9f9f9; /* Fondo claro */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra */
+}
+
+/* Estilo para las etiquetas */
+label {
+    font-weight: 600;
+    color: #333;
+    margin-top: 10px;
+    align-self: flex-start; /* Alinea las etiquetas a la izquierda */
+}
+
+/* Estilo para los campos de entrada */
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+/* Estilo para el botón */
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff; /* Color de fondo azul */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3; /* Oscurece el fondo al pasar el mouse */
+}
+
+/* Estilos para hacer el formulario responsive */
+@media (max-width: 600px) {
+    form {
+        width: 90%;
+        padding: 15px;
+    }
+}
+
