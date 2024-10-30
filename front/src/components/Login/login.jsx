@@ -17,23 +17,23 @@ function Login() {
     };
 
     return (
-        <form onSubmit={handleLogin}>
-            <label htmlFor="username">Username:</label>
-            <input
+        <form className='log-form' onSubmit={handleLogin}>
+            <label className='log-lbl' htmlFor="username">Username:</label>
+            <input className='log-input'
                 type="text"
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
             />
-            <label htmlFor="password">Password:</label>
+            <label className='log-lbl' htmlFor="password">Password:</label>
             <input
                 type="password"
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
-            <button type="submit">Login</button>
-            <button type="register">Register</button>
+            <button className='submit-btn' type="submit">Login</button>
+            <button className='register-btn' type="register">Register</button>
         </form>
     );
 }

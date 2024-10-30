@@ -13,7 +13,7 @@
 }
 
 /* Estilo para el título */
-.register-form h2 {
+.r-title {
     margin-bottom: 20px;
     color: #333;
     font-size: 24px;
@@ -22,7 +22,7 @@
 }
 
 /* Estilo para las etiquetas */
-label {
+.label {
     font-weight: 600;
     color: #333;
     margin-top: 10px;
@@ -30,9 +30,9 @@ label {
 }
 
 /* Estilo para los campos de entrada */
-input[type="text"],
-input[type="email"],
-input[type="password"] {
+.input[type="text"],
+.input[type="email"],
+.input[type="password"] {
     width: 100%;
     padding: 10px;
     margin-top: 5px;
@@ -43,15 +43,15 @@ input[type="password"] {
     transition: border-color 0.3s;
 }
 
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus {
+.input[type="text"]:focus,
+.input[type="email"]:focus,
+.input[type="password"]:focus {
     border-color: #007bff;
     outline: none;
 }
 
 /* Estilo para el botón */
-button {
+.reg-button {
     width: 100%;
     padding: 10px;
     background-color: #28a745; /* Verde para el botón de registro */
@@ -64,7 +64,7 @@ button {
     transition: background-color 0.3s;
 }
 
-button:hover {
+.reg-button:hover {
     background-color: #218838;
 }
 

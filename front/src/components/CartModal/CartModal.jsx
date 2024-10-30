@@ -1,7 +1,7 @@
 import React from "react";
 import "./CartModal.css"; // Puedes crear este archivo para los estilos del modal
 
-const CartModal = ({ cartItems, onRemoveItem, onClose }) => {
+const CartModal = ({ cartItems, onRemoveItem, onClose, onProceedToPayment  }) => {
   // Calcula el total del precio y la cantidad total de productos
   const totalAmount = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
@@ -67,8 +67,8 @@ const CartModal = ({ cartItems, onRemoveItem, onClose }) => {
               <button className='continue-shopping' onClick={onClose}>
                 Seguir comprando
               </button>
-              <button className='checkout'>Proceder al pago</button>
-            </div>
+              <button className='checkout' onClick={onProceedToPayment}>Proceder al pago</button>
+              </div>
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext } from "react";
+import PaymentForm from "../PaymentForm/PaymentForm"; // Asegúrate de importar el nuevo componente
 import CartModal from "./CartModal";
-
 
 // Crear el contexto del carrito
 const CartContext = createContext();
@@ -14,7 +14,8 @@ export const useCart = () => {
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const[notification, setNotification] = useState(null);
+  const [notification, setNotification] = useState(null);
+  const [isPaymentFormOpen, setIsPaymentFormOpen] = useState(false);
 
   const addToCart = (product) => {
     setCartItems((prevItems) => {
@@ -49,12 +50,28 @@ export const CartProvider = ({ children }) => {
     setIsCartOpen(!isCartOpen);
   };
 
+  const openPaymentForm = () => {
+    setIsPaymentFormOpen(true);
+  };
+
+  const closePaymentForm = () => {
+    setIsPaymentFormOpen(false);
+  };
+
   // Contador de la cantidad total de productos en el carrito
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, toggleCart, cartCount }}
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        toggleCart,
+        cartCount,
+        openPaymentForm,
+        closePaymentForm,
+      }}
     >
       {children}
       {/* Renderizamos el modal del carrito si está abierto */}
@@ -63,13 +80,14 @@ export const CartProvider = ({ children }) => {
           cartItems={cartItems}
           onRemoveItem={removeFromCart}
           onClose={toggleCart}
+          onProceedToPayment={openPaymentForm} // Asegúrate de que esto esté aquí
+
         />
       )}
 
-      {notification &&( 
-      <div className='cart-notification'>{notification}
-      </div>
-      )}
+      {isPaymentFormOpen && <PaymentForm onClose={closePaymentForm} />}
+
+      {notification && <div className='cart-notification'>{notification}</div>}
     </CartContext.Provider>
   );
 };
