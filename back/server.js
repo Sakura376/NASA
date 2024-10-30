@@ -3,7 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const db = require('./db'); // Importa la conexión a la base de datos
+const db = require('./Interno/ConexionMySql/db'); // Importa la conexión a la base de datos
 
 dotenv.config();
 

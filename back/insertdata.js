@@ -1,4 +1,4 @@
-const pool = require('../ConexionMySql/db');
+const pool = require('./Interno/ConexionMySql/db');
 const jsonData = [
         {
           "id": "1",
@@ -115,7 +115,7 @@ const jsonData = [
 async function insertData() {
     try {
         for (const item of jsonData) {
-            const query = `INSERT INTO rockets (id, title, tipoNave, descriptionProduct, descriptionInfo, caracteristics, imageProduct, imageInfo, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            const query = `INSERT INTO products (product_id, title, type, description, info_description, characteristics, image_url, info_image_url, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
             const values = [item.id, item.title, item.tipoNave, item.descriptionProduct, item.descriptionInfo, item.caracteristics, item.imageProduct, item.imageInfo, item.price];
             const [results] = await pool.query(query, values);
             console.log("Registro insertado, ID:", results.insertId);
