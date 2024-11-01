@@ -1,33 +1,29 @@
 // server.js
+
+require('dotenv').config();
 const express = require('express');
-const morgan = require('morgan');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const db = require('./Interno/ConexionMySql/db'); // Importa la conexión a la base de datos
-
-dotenv.config();
-
 const app = express();
-const port = process.env.PORT || 3001;
+const db = require('./config/db');
+const models = require('./Models'); // Importa los modelos y establece las asociaciones
 
 // Middlewares
-app.use(morgan('dev'));
-app.use(cors());
 app.use(express.json());
 
-// Ruta de prueba para verificar la conexión a la base de datos
-app.get('/test-db', async (req, res) => {
-    try {
-        // Realiza una consulta simple para verificar la conexión
-        const [rows] = await db.query('SELECT 1 + 1 AS solution');
-        res.json({ message: 'Conexión exitosa a la base de datos', solution: rows[0].solution });
-    } catch (error) {
-        console.error('Error al conectar con la base de datos:', error);
-        res.status(500).json({ error: 'Error de conexión a la base de datos' });
-    }
-});
+// Rutas
+const apiRoutes = require('./routes/api');
+app.use('/api', apiRoutes);
 
 // Iniciar el servidor
-app.listen(port, () => {
-    console.log(`Servidor corriendo en http://localhost:${port}`);
-});
+const PORT = process.env.PORT || 3002;
+db.authenticate()
+    .then(() => {
+        console.log('Conexión a la base de datos establecida correctamente.');
+        app.listen(PORT, () => {
+            console.log(`Servidor funcionando en el puerto ${PORT}`);
+        });
+    })
+    .catch(err => {
+        console.error('No se pudo conectar a la base de datos:', err);
+    });
+
+module.exports = app;
