@@ -2,24 +2,20 @@ import React, { useState } from "react";
 import "./Header.css";
 import Productos from "../../services/products.json";
 import { useCart } from "../CartModal/CartGlobal";
-
-// SubMenu remains unchanged
-const SubMenu = ({ items, tipo }) => (
-  <ul className='submenu1'>
-    {items.map((item, index) => (
-      <li key={index}>
-        <a href={`#product-type${tipo}`}>Naves de {item}</a>
-      </li>
-    ))}
-  </ul>
-);
+import Login from "../Login/login";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const tipoNaves = [...new Set(Productos.map((ship) => ship.tipoNave))];
-  const { cartCount, toggleCart } = useCart(); // Usamos toggleCart
+  const { cartCount, toggleCart } = useCart();
+  const [activeModal, setActiveModal] = useState(false);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
+
+  // Cambia el estado de activeModal
+  const handleModal = () => {
+    setActiveModal(!activeModal);
+  };
 
   return (
     <>
@@ -53,7 +49,7 @@ const Header = () => {
 
           <div className='input-container'>
             <input type='text' id='input' required />
-            <label htmlFor='input' className='label'>
+            <label htmlFor='input' className='search'>
               Search
             </label>
             <div className='underline'></div>
@@ -62,12 +58,15 @@ const Header = () => {
             </button>
           </div>
 
-          {/* Carrito de compras con contador dinámico */}
           <div className='shopping-cart'>
-            <button className='cart-container' onClick={toggleCart}> {/* Cambié onCartClick por toggleCart */}
+            <button className='cart-container' onClick={toggleCart}>
               <i className='fas fa-shopping-cart'></i>
-              <span className='cart-count'>{cartCount}</span>{" "}
-              {/* contador dinámico */}
+              <span className='cart-count'>{cartCount}</span>
+            </button>
+
+            <button className="log-button" onClick={handleModal}>
+              <i className='fas fa-user'></i>
+              <span className="log-cta">Iniciar Sesión</span>
             </button>
           </div>
         </div>
@@ -77,6 +76,9 @@ const Header = () => {
         <h1>ShipShop</h1>
         <h2>“Viaja Más Allá con Nuestros Modelos de Naves Espaciales”</h2>
       </section>
+
+      {/* Renderiza el modal de login si activeModal es true */}
+      {activeModal && <Login closeModal={handleModal} statusModal={activeModal}/>}
     </>
   );
 };

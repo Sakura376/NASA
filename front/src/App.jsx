@@ -12,9 +12,9 @@ function App() {
     <CartProvider> {/* Envuelve toda la aplicación con CartProvider */}
       <Router>
         <>
-          <Header />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/registro" element={<Registro />} />
           </Routes>
           <Footer />
         </>
