@@ -61,4 +61,23 @@ exports.createRating = async (req, res) => {
     }
 };
 
+exports.getRatedProductsByUser = async (req, res) => {
+    const { userId } = req.params;
+  
+    try {
+      const ratedProducts = await ProductRating.findAll({
+        where: { user_id: userId },
+        include: [{
+          model: Product,
+          attributes: ['id', 'title', 'description', 'price', 'imageUrl'] // Asegúrate de incluir los atributos que necesitas
+        }]
+      });
+  
+      res.json(ratedProducts);
+    } catch (error) {
+      console.error('Error al obtener productos calificados:', error);
+      res.status(500).json({ error: 'Error al obtener productos calificados' });
+    }
+  };
+
 // Puedes añadir más métodos como updateRating, deleteRating, etc.

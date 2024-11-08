@@ -79,6 +79,41 @@ nav {
   border-radius: 5px;
 }
 
+.user-menu {
+  position: relative;
+}
+
+.submenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #333333;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.user-menu:hover .submenu {
+  display: block;
+}
+
+.logout-button {
+  background-color: transparent;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: left;
+  width: 100%;
+}
+
+.logout-button:hover {
+  background-color: #555555;
+  color: #ffffff;
+}
+
+
 
 nav ul {
   list-style: none;

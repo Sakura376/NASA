@@ -1,6 +1,7 @@
 // controllers/userController.js
-
 const User = require('../Models/user');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 exports.getAllUsers = async (req, res) => {
     try {
@@ -10,6 +11,32 @@ exports.getAllUsers = async (req, res) => {
         console.error('Error al obtener los usuarios:', error);
         res.status(500).json({ error: 'Error al obtener los usuarios' });
     }
+};
+
+exports.loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Verificar si el usuario existe
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Comparar la contraseña
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Contraseña incorrecta' });
+    }
+
+    // Generar un token de sesión (opcional)
+    const token = jwt.sign({ id: user.user_id }, 'yourSecretKey', { expiresIn: '1h' });
+
+    res.json({ message: 'Inicio de sesión exitoso', token });
+  } catch (error) {
+    console.error('Error en el inicio de sesión:', error);
+    res.status(500).json({ error: 'Error en el inicio de sesión' });
+  }
 };
 
 exports.getUserById = async (req, res) => {

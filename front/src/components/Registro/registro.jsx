@@ -3,7 +3,8 @@ import './registro.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faLock, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
-
+import axios from 'axios';
+import { API_URL } from '../../config';
 function Register() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -13,13 +14,27 @@ function Register() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-
+    
         if (password !== confirmPassword) {
-            alert("Passwords do not match");
-            return;
+        alert("Las contraseñas no coinciden");
+        return;
         }
-
-        console.log("Registration successful!");
+    
+        try {
+        const response = await axios.post(`${API_URL}/users`, {
+            username,
+            email,
+            password
+        });
+    
+        if (response.status === 201) {
+            alert("¡Registro exitoso!");
+            navigate("/"); // Redirigir después del registro
+        }
+        } catch (error) {
+        console.error("Error al registrar el usuario:", error);
+        alert("Hubo un problema al registrar el usuario");
+        }
     };
 
     const handleBack = () => {

@@ -5,6 +5,9 @@ const express = require('express');
 const app = express();
 const db = require('./config/db');
 const models = require('./Models'); // Importa los modelos y establece las asociaciones
+const cors = require('cors');
+app.use(cors());
+
 
 // Middlewares
 app.use(express.json());
