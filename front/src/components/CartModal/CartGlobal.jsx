@@ -104,6 +104,10 @@ export const CartProvider = ({ children }) => {
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
+  const clearCart = () => {
+    setCartItems([]); // Vacía el carrito
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -124,7 +128,7 @@ export const CartProvider = ({ children }) => {
           onProceedToPayment={openPaymentForm} // Pasamos la función al CartModal
         />
       )}
-      {isPaymentFormOpen && <PaymentForm onClose={closePaymentForm} />}
+      {isPaymentFormOpen && <PaymentForm onClose={closePaymentForm} onConfirmPayment={clearCart} />}
       {notification && <div className='cart-notification'>{notification}</div>}
     </CartContext.Provider>
   );

@@ -3,13 +3,15 @@ import "./PaymentForm.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCreditCard, faCalendarAlt, faLock, faUser } from "@fortawesome/free-solid-svg-icons";
 
-const PaymentForm = ({ onClose }) => {
+const PaymentForm = ({ onClose, onConfirmPayment }) => { // Recibe la función onConfirmPayment para vaciar el carrito
   const [formData, setFormData] = useState({
     cardNumber: "",
     expiryDate: "",
     cvv: "",
     cardholderName: ""
   });
+  const [error, setError] = useState("");
+  const [confirmationMessage, setConfirmationMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,8 +19,29 @@ const PaymentForm = ({ onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Datos del formulario:", formData);
-    onClose(); // Cierra el modal después de enviar el formulario
+
+    // Validar que todos los campos estén llenos
+    if (!formData.cardNumber || !formData.expiryDate || !formData.cvv || !formData.cardholderName) {
+      setError("Por favor, complete todos los campos.");
+      return;
+    }
+
+    // Mostrar mensaje de confirmación y vaciar el carrito
+    setConfirmationMessage("¡Compra confirmada!");
+    setError("");
+    onConfirmPayment(); // Llama a la función para vaciar el carrito
+
+    // Limpia el formulario y cierra el modal después de un breve retraso
+    setTimeout(() => {
+      setConfirmationMessage("");
+      setFormData({
+        cardNumber: "",
+        expiryDate: "",
+        cvv: "",
+        cardholderName: ""
+      });
+      onClose();
+    }, 2000);
   };
 
   return (
@@ -29,10 +52,10 @@ const PaymentForm = ({ onClose }) => {
     }}>
       <div className='payment-form'>
         <form className='f-payment' onSubmit={handleSubmit}>
-          
           <div className="input-payment">
             <FontAwesomeIcon icon={faCreditCard} className="input-icon" />
-            <input className="i-payment"
+            <input
+              className="i-payment"
               type="text"
               name="cardNumber"
               value={formData.cardNumber}
@@ -43,7 +66,8 @@ const PaymentForm = ({ onClose }) => {
 
           <div className="input-payment">
             <FontAwesomeIcon icon={faCalendarAlt} className="input-icon" />
-            <input className="i-payment"
+            <input
+              className="i-payment"
               type="text"
               name="expiryDate"
               value={formData.expiryDate}
@@ -54,7 +78,8 @@ const PaymentForm = ({ onClose }) => {
 
           <div className="input-payment">
             <FontAwesomeIcon icon={faLock} className="input-icon" />
-            <input className="i-payment"
+            <input
+              className="i-payment"
               type="text"
               name="cvv"
               value={formData.cvv}
@@ -65,7 +90,8 @@ const PaymentForm = ({ onClose }) => {
 
           <div className="input-payment">
             <FontAwesomeIcon icon={faUser} className="input-icon" />
-            <input className="i-payment"
+            <input
+              className="i-payment"
               type="text"
               name="cardholderName"
               value={formData.cardholderName}
@@ -74,6 +100,8 @@ const PaymentForm = ({ onClose }) => {
             />
           </div>
 
+          {error && <p className="error-message">{error}</p>}
+          {confirmationMessage && <p className="confirmation-message">{confirmationMessage}</p>}
           <button className="p-button" type="submit">Confirmar Pago</button>
         </form>
         <button className="close-btn" onClick={onClose}>Cerrar</button>

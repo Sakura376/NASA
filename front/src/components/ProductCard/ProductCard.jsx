@@ -74,6 +74,7 @@ const ProductCard = ({ id, title, imageProduct, price, caracteristics, rating })
           product={product}
           onClose={closeModal}
           onAddToCart={addToCart}
+          selectedRating={selectedRating} 
         />
       )}
 

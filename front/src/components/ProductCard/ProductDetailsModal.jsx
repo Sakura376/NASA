@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './ProductDetailsModal.css';
 
-const ProductDetailsModal = ({ product, onClose, onAddToCart }) => {
+const ProductDetailsModal = ({ product, onClose, onAddToCart, selectedRating }) => {
   const { title, imageProduct, price, caracteristics } = product;
 
   // Función para detectar clic fuera del contenido del modal
@@ -22,7 +22,9 @@ const ProductDetailsModal = ({ product, onClose, onAddToCart }) => {
         <img src={imageProduct} alt={title} className="product-image" />
         <h2>{title}</h2>
         <p><strong>Precio:</strong>{parseFloat(price).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</p>
-        {/* <p><strong>Características:</strong> {caracteristics}</p> */}
+        {selectedRating && (
+          <p><strong>Calificación seleccionada:</strong> {selectedRating} estrellas</p>
+        )}
         <button onClick={() => onAddToCart(product)} className="add-to-cart">
           Añadir al carrito
         </button>
