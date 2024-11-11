@@ -24,8 +24,9 @@ function Login({ closeModal, statusModal, onLoginSuccess }) {
       if (response.status === 200) {
         alert("Inicio de sesión exitoso");
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("userName", username); // Guardamos el nombre de usuario
-        onLoginSuccess(username); // Llamamos a la función de éxito del login
+        localStorage.setItem("userName", response.data.username); // Guardamos el nombre de usuario desde la respuesta
+        localStorage.setItem("userId", response.data.userId); // Guardamos el user_id desde la respuesta
+        onLoginSuccess(response.data.username); // Llamamos a la función de éxito del login
         closeModal();
         navigate("/");
       }

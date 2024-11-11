@@ -4,6 +4,38 @@
 
 const { OrderFinal, User, OrderDetail, Product } = require('../Models');
 console.log('OrderFinal:', OrderFinal);
+const twilio = require('twilio');
+const accountSid = 'YOUR_TWILIO_ACCOUNT_SID';
+const authToken = 'YOUR_TWILIO_AUTH_TOKEN';
+
+exports.createOrder = async (req, res) => {
+    const { user_id, total } = req.body;
+  
+    try {
+      // Crea el pedido en la base de datos
+      const newOrder = await Order.create({
+        user_id,
+        total,
+        order_date: new Date(),
+      });
+  
+      // Obtener el número de WhatsApp del usuario (ajusta este código a tu estructura de usuario)
+      const user = await User.findByPk(user_id);
+      const userWhatsApp = user.whatsapp_number; // Asegúrate de que este campo esté en tu base de datos
+  
+      // Enviar mensaje de WhatsApp
+      await client.messages.create({
+        body: `Gracias por tu compra. Tu pedido de $${total.toFixed(2)} ha sido confirmado.`,
+        from: 'whatsapp:+14155238886', // Número de Twilio para WhatsApp (ajusta según tu configuración)
+        to: `whatsapp:${userWhatsApp}`, // Número del usuario
+      });
+  
+      res.status(201).json(newOrder);
+    } catch (error) {
+      console.error('Error al crear el pedido o enviar mensaje de WhatsApp:', error);
+      res.status(500).json({ error: 'Error al crear el pedido' });
+    }
+  };
 
 exports.getAllOrders = async (req, res) => {
     try {
@@ -68,77 +100,21 @@ exports.getOrderById = async (req, res) => {
 };
 
 exports.createOrder = async (req, res) => {
-    try {
-        const { user_id, orderDetails } = req.body;
+  const { user_id, total } = req.body;
 
-        // Validaciones básicas
-        if (!user_id || !orderDetails || !Array.isArray(orderDetails)) {
-            return res.status(400).json({ error: 'Datos inválidos' });
-        }
-
-        // Verificar que el usuario existe
-        const user = await User.findByPk(user_id);
-        if (!user) {
-            return res.status(400).json({ error: 'Usuario no válido' });
-        }
-
-        // Crear la orden
-        const newOrder = await OrderFinal.create({
-            user_id,
-            total: 0 // Se actualizará después
-        });
-
-        let totalOrder = 0;
-
-        // Crear los detalles de la orden
-        for (const detail of orderDetails) {
-            const { product_id, quantity, price } = detail;
-
-            // Validar datos
-            if (!product_id || !quantity || !price) {
-                return res.status(400).json({ error: 'Datos de detalle inválidos' });
-            }
-
-            // Verificar que el producto existe
-            const product = await Product.findByPk(product_id);
-            if (!product) {
-                return res.status(400).json({ error: `Producto no válido: ${product_id}` });
-            }
-
-            // Crear el detalle de la orden
-            await OrderDetail.create({
-                order_id: newOrder.order_id,
-                product_id,
-                quantity,
-                price
-            });
-
-            totalOrder += quantity * price;
-        }
-
-        // Actualizar el total de la orden
-        await OrderFinal.update(
-            { total: totalOrder },
-            { where: { order_id: newOrder.order_id } }
-        );
-
-        // Obtener la orden con detalles
-        const createdOrder = await OrderFinal.findByPk(newOrder.order_id, {
-            include: [
-                {
-                    model: OrderDetail,
-                    as: 'orderDetails',
-                    include: [{ model: Product, as: 'product' }]
-                }
-            ]
-        });
-
-        res.status(201).json(createdOrder);
-    } catch (error) {
-        console.error('Error al crear la orden:', error);
-        res.status(500).json({ error: 'Error al crear la orden' });
-    }
+  try {
+    const newOrder = await Order.create({
+      user_id,
+      total,
+      order_date: new Date(), // Usamos la fecha actual para el pedido
+    });
+    res.status(201).json(newOrder);
+  } catch (error) {
+    console.error('Error al crear el pedido:', error);
+    res.status(500).json({ error: 'Error al crear el pedido' });
+  }
 };
+
 
 exports.updateOrder = async (req, res) => {
     try {

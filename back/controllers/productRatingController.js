@@ -46,38 +46,103 @@ exports.createRating = async (req, res) => {
             return res.status(400).json({ error: 'Producto no válido' });
         }
 
-        // Crear la calificación
+        // Verificar si ya existe una calificación para este usuario y producto
+        const existingRating = await ProductRating.findOne({
+            where: { product_id, user_id }
+        });
+
+        if (existingRating) {
+            // Actualizar la calificación existente
+            existingRating.rating = rating_value;
+            existingRating.comment = comment;
+            await existingRating.save();
+
+            return res.status(200).json({
+                message: 'Calificación actualizada',
+                rating: existingRating
+            });
+        }
+
+        // Crear una nueva calificación si no existe una previa
         const newRating = await ProductRating.create({
             product_id,
             user_id,
-            rating_value,
+            rating: rating_value,
             comment
         });
 
-        res.status(201).json(newRating);
+        res.status(201).json({
+            message: 'Calificación creada',
+            rating: newRating
+        });
     } catch (error) {
-        console.error('Error al crear la calificación:', error);
-        res.status(500).json({ error: 'Error al crear la calificación' });
+        console.error('Error al crear o actualizar la calificación:', error);
+        res.status(500).json({ error: 'Error al crear o actualizar la calificación' });
     }
 };
 
+
+// controllers/productRatingController.js
+
+
 exports.getRatedProductsByUser = async (req, res) => {
     const { userId } = req.params;
+
+    try {
+        const ratedProducts = await ProductRating.findAll({
+            where: { user_id: userId },
+            include: [{
+                model: Product,
+                as: 'product', // Usa el alias correcto en la relación
+                attributes: ['product_id', 'title', 'description', 'price', 'image_url'] // Cambia 'id' a 'product_id'
+            }]
+        });
+
+        res.json(ratedProducts);
+    } catch (error) {
+        console.error('Error al obtener productos calificados:', error);
+        res.status(500).json({ error: 'Error al obtener productos calificados' });
+    }
+};
+
+exports.getUserRatingForProduct = async (req, res) => {
+    const { userId, productId } = req.params;
   
     try {
-      const ratedProducts = await ProductRating.findAll({
-        where: { user_id: userId },
-        include: [{
-          model: Product,
-          attributes: ['id', 'title', 'description', 'price', 'imageUrl'] // Asegúrate de incluir los atributos que necesitas
-        }]
+      const rating = await ProductRating.findOne({
+        where: { user_id: userId, product_id: productId }
       });
   
-      res.json(ratedProducts);
+      if (rating) {
+        res.json({ rating: rating.rating });
+      } else {
+        res.status(404).json({ error: 'No rating found for this product and user' });
+      }
     } catch (error) {
-      console.error('Error al obtener productos calificados:', error);
-      res.status(500).json({ error: 'Error al obtener productos calificados' });
+      console.error("Error al obtener la calificación:", error);
+      res.status(500).json({ error: 'Error al obtener la calificación' });
     }
   };
+  
+  // controllers/orderDetailController.js
+
+exports.deleteOrderDetail = async (req, res) => {
+    try {
+        const { userId, productId } = req.params;
+
+        const deletedRows = await OrderDetail.destroy({
+            where: { user_id: userId, product_id: productId }
+        });
+
+        if (deletedRows === 0) {
+            return res.status(404).json({ error: 'Producto no encontrado en el carrito' });
+        }
+
+        res.json({ message: 'Producto eliminado del carrito' });
+    } catch (error) {
+        console.error('Error al eliminar el producto del carrito:', error);
+        res.status(500).json({ error: 'Error al eliminar el producto del carrito' });
+    }
+};
 
 // Puedes añadir más métodos como updateRating, deleteRating, etc.

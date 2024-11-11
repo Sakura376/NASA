@@ -47,39 +47,47 @@ exports.getOrderDetailById = async (req, res) => {
     }
 };
 
+// controllers/orderDetailController.js
+
+// controllers/orderDetailController.js
 exports.createOrderDetail = async (req, res) => {
     try {
-        const { user_id, product_id, quantity, price } = req.body;
+        const { user_id, items } = req.body;
 
-        // Validaciones básicas
-        if (!user_id || !product_id || !quantity || !price) {
-            return res.status(400).json({ error: 'Todos los campos son requeridos' });
+        if (!user_id || !items || items.length === 0) {
+            return res.status(400).json({ error: 'Datos incompletos' });
         }
 
-        // Verificar que el usuario existe
-        const user = await User.findByPk(user_id);
-        if (!user) {
-            return res.status(400).json({ error: 'Usuario no válido' });
-        }
+        const orderDetails = await Promise.all(
+            items.map(async (item) => {
+                const existingOrderDetail = await OrderDetail.findOne({
+                    where: { user_id, product_id: item.product_id }
+                });
 
-        // Verificar que el producto existe
-        const product = await Product.findByPk(product_id);
-        if (!product) {
-            return res.status(400).json({ error: 'Producto no válido' });
-        }
+                if (existingOrderDetail) {
+                    // Si el producto ya está en el carrito, actualizamos la cantidad
+                    existingOrderDetail.quantity += item.quantity;
+                    await existingOrderDetail.save();
+                    return existingOrderDetail;
+                } else {
+                    // Si no existe, creamos un nuevo detalle de orden
+                    return OrderDetail.create({
+                        user_id,
+                        product_id: item.product_id,
+                        quantity: item.quantity,
+                        price: item.price
+                    });
+                }
+            })
+        );
 
-        const newOrderDetail = await OrderDetail.create({
-            user_id,
-            product_id,
-            quantity,
-            price
-        });
-        res.status(201).json(newOrderDetail);
+        res.status(201).json(orderDetails);
     } catch (error) {
-        console.error('Error al crear el detalle de la orden:', error);
-        res.status(500).json({ error: 'Error al crear el detalle de la orden' });
+        console.error('Error al crear los detalles de la orden:', error);
+        res.status(500).json({ error: 'Error al crear los detalles de la orden' });
     }
 };
+
 
 exports.updateOrderDetail = async (req, res) => {
     try {
@@ -106,17 +114,33 @@ exports.updateOrderDetail = async (req, res) => {
 
 exports.deleteOrderDetail = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { userId, productId } = req.params;
 
-        const orderDetail = await OrderDetail.findByPk(id);
+        // Busca el detalle del pedido según user_id y product_id
+        const orderDetail = await OrderDetail.findOne({
+            where: {
+                user_id: userId,
+                product_id: productId
+            }
+        });
+
+        // Si no se encuentra el detalle, envía un error 404
         if (!orderDetail) {
             return res.status(404).json({ error: 'Detalle de la orden no encontrado' });
         }
 
-        await OrderDetail.destroy({ where: { order_detail_id: id } });
+        // Elimina el detalle del pedido
+        await OrderDetail.destroy({
+            where: {
+                user_id: userId,
+                product_id: productId
+            }
+        });
+
         res.json({ message: 'Detalle de la orden eliminado correctamente' });
     } catch (error) {
         console.error('Error al eliminar el detalle de la orden:', error);
         res.status(500).json({ error: 'Error al eliminar el detalle de la orden' });
     }
 };
+

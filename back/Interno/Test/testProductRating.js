@@ -1,7 +1,7 @@
 // testRating.js
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
-const db = require('../ConexionMySql/db'); // Ajusta la ruta según tu estructura
+const db = require('../../config/db'); // Ajusta la ruta según tu estructura
 const Rating = require('../../Models/productRating'); // Ajusta la ruta según tu estructura
 
 // Función principal para ejecutar las pruebas
@@ -12,9 +12,10 @@ async function testRatingModel() {
         console.log('Conexión a la base de datos establecida correctamente.');
 
         // **Crear** un nuevo rating
-        const newRating = await Rating.create({
+        const newRating =  await Rating.create({
             product_id: 1, // Ajusta el ID según un producto existente
             user_id: 1,    // Ajusta el ID según un usuario existente
+            rating: 3
             // rating_date se establecerá automáticamente al valor actual
         });
         console.log('Nuevo Rating creado:', newRating.toJSON());

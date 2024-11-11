@@ -3,6 +3,7 @@ import "./Header.css";
 import Productos from "../../services/products.json";
 import { useCart } from "../CartModal/CartGlobal";
 import Login from "../Login/login";
+import { API_URL } from "../../config"; // Asegúrate de que está configurada la URL de la API
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -11,14 +12,36 @@ const Header = () => {
   const [activeModal, setActiveModal] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userName, setUserName] = useState("");
+  const [userRatings, setUserRatings] = useState([]); // Estado para calificaciones del usuario
 
   useEffect(() => {
     const storedUserName = localStorage.getItem("userName");
     if (storedUserName) {
       setIsAuthenticated(true);
       setUserName(storedUserName);
+      loadUserRatings(); // Cargar calificaciones si el usuario ya está autenticado
     }
   }, []);
+
+  // Función para cargar las calificaciones del usuario desde el backend
+  const loadUserRatings = async () => {
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+    if (!userId || !token) return;
+
+    try {
+      const response = await fetch(`${API_URL}/ratings/ratings/user/${userId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      setUserRatings(data); // Guardamos las calificaciones en el estado
+    } catch (error) {
+      console.error("Error al cargar las calificaciones del usuario:", error);
+    }
+  };
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
@@ -27,16 +50,25 @@ const Header = () => {
   };
 
   const handleLogout = () => {
+    // Elimina la información de autenticación y calificaciones del almacenamiento local
     localStorage.removeItem("token");
     localStorage.removeItem("userName");
+    localStorage.removeItem("userId");
+
+    // Reinicia el estado de autenticación y el nombre de usuario
     setIsAuthenticated(false);
     setUserName("");
+    setUserRatings([]); // Limpia las calificaciones al cerrar sesión
+
+    // Recargar la página
+    window.location.reload();
   };
 
   const handleLoginSuccess = (username) => {
     setIsAuthenticated(true);
     setUserName(username);
     setActiveModal(false);
+    loadUserRatings(); // Cargar las calificaciones después de iniciar sesión
   };
 
   return (
