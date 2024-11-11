@@ -1,4 +1,3 @@
-// CartGlobal.js
 import React, { createContext, useState, useContext } from "react";
 import axios from "axios";
 import { API_URL } from "../../config";
@@ -31,11 +30,13 @@ export const CartProvider = ({ children }) => {
         `${API_URL}/order-details/create`,
         {
           user_id: userId,
-          items: [{ 
-            product_id: product.id,
-            quantity: 1,
-            price: product.price
-          }]
+          items: [
+            {
+              product_id: product.id,
+              quantity: 1,
+              price: product.price,
+            },
+          ],
         },
         {
           headers: {
@@ -43,9 +44,15 @@ export const CartProvider = ({ children }) => {
           },
         }
       );
-      console.log("Producto añadido al carrito en la base de datos:", product.title);
+      console.log(
+        "Producto añadido al carrito en la base de datos:",
+        product.title
+      );
     } catch (error) {
-      console.error("Error al guardar el producto en el carrito:", error.response?.data || error.message);
+      console.error(
+        "Error al guardar el producto en el carrito:",
+        error.response?.data || error.message
+      );
     }
   };
 
@@ -76,19 +83,30 @@ export const CartProvider = ({ children }) => {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.delete(`${API_URL}/order-details/cart/${userId}/${productId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      await axios.delete(
+        `${API_URL}/order-details/cart/${userId}/${productId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
 
       setCartItems((prevItems) =>
         prevItems.filter((item) => item.id !== productId)
       );
     } catch (error) {
-      console.error("Error al eliminar el producto del carrito en la base de datos:", error);
+      console.error(
+        "Error al eliminar el producto del carrito en la base de datos:",
+        error
+      );
     }
   };
+
+  const totalAmount = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
@@ -128,7 +146,13 @@ export const CartProvider = ({ children }) => {
           onProceedToPayment={openPaymentForm} // Pasamos la función al CartModal
         />
       )}
-      {isPaymentFormOpen && <PaymentForm onClose={closePaymentForm} onConfirmPayment={clearCart} />}
+      {isPaymentFormOpen && (
+        <PaymentForm
+          onClose={closePaymentForm}
+          onConfirmPayment={clearCart}
+          totalAmount={totalAmount} 
+        />
+      )}
       {notification && <div className='cart-notification'>{notification}</div>}
     </CartContext.Provider>
   );

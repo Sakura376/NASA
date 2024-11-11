@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./PaymentForm.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCreditCard, faCalendarAlt, faLock, faUser } from "@fortawesome/free-solid-svg-icons";
+import { API_URL } from "../../config"; // Asegúrate de tener la URL base configurada
 
-const PaymentForm = ({ onClose, onConfirmPayment }) => { // Recibe la función onConfirmPayment para vaciar el carrito
+const PaymentForm = ({ onClose, onConfirmPayment, totalAmount }) => {
   const [formData, setFormData] = useState({
     cardNumber: "",
     expiryDate: "",
@@ -17,7 +19,7 @@ const PaymentForm = ({ onClose, onConfirmPayment }) => { // Recibe la función o
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validar que todos los campos estén llenos
@@ -26,22 +28,44 @@ const PaymentForm = ({ onClose, onConfirmPayment }) => { // Recibe la función o
       return;
     }
 
-    // Mostrar mensaje de confirmación y vaciar el carrito
-    setConfirmationMessage("¡Compra confirmada!");
-    setError("");
-    onConfirmPayment(); // Llama a la función para vaciar el carrito
+    try {
+      const userId = localStorage.getItem("userId");
+      const token = localStorage.getItem("token");
 
-    // Limpia el formulario y cierra el modal después de un breve retraso
-    setTimeout(() => {
-      setConfirmationMessage("");
-      setFormData({
-        cardNumber: "",
-        expiryDate: "",
-        cvv: "",
-        cardholderName: ""
-      });
-      onClose();
-    }, 2000);
+      // Enviar datos de la orden a la API
+      await axios.post(
+        `${API_URL}/orderFinal/create`,
+        {
+          user_id: userId,
+          total:totalAmount
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
+
+      // Mostrar mensaje de confirmación y vaciar el carrito
+      setConfirmationMessage("¡Compra confirmada!");
+      setError("");
+      onConfirmPayment(); // Llama a la función para vaciar el carrito
+
+      // Limpia el formulario y cierra el modal después de un breve retraso
+      setTimeout(() => {
+        setConfirmationMessage("");
+        setFormData({
+          cardNumber: "",
+          expiryDate: "",
+          cvv: "",
+          cardholderName: ""
+        });
+        onClose();
+      }, 2000);
+    } catch (error) {
+      console.error("Error al confirmar el pago:", error.response?.data || error.message);
+      setError("Error al procesar el pago.");
+    }
   };
 
   return (
